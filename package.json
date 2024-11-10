@@ -1,0 +1,65 @@
+{
+  "name": "@firelands/stormlib-ts",
+  "version": "0.1.0",
+  "description": "Node.js bindings for StormLib to work with MPQ archives",
+  "main": "dist/main.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsc -w",
+    "preinstall": "pnpm compile",
+    "postinstall": "node-gyp rebuild",
+    "compile": "node scripts/compile-stormlib.mjs",
+    "build": "tsc",
+    "test": "mocha",
+    "example": "node ./example/index.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FirelandsProject/Stormlib-ts.git"
+  },
+  "keywords": [
+    "stormlib",
+    "mpq",
+    "warcraft",
+    "blizzard"
+  ],
+  "author": "Seobryn",
+  "license": "AGPL-3.0-only",
+  "bugs": {
+    "url": "https://github.com/FirelandsProject/Stormlib-ts/issues"
+  },
+  "homepage": "https://github.com/FirelandsProject/Stormlib-ts#README",
+  "dependencies": {
+    "bindings": "^1.5.0",
+    "node-addon-api": "^5.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.14.0",
+    "@types/bindings": "^1.5.5",
+    "chai": "^4.3.7",
+    "eslint": "^9.14.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "globals": "^15.12.0",
+    "mocha": "^10.2.0",
+    "prettier": "^3.3.3",
+    "tmp-promise": "^3.0.3",
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.13.0"
+  },
+  "engines": {
+    "node": ">=18.19.0"
+  },
+  "files": [
+    "dist",
+    "scripts",
+    "StormLib",
+    "binding.gyp",
+    "README.md",
+    "LICENSE",
+    "package.json"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

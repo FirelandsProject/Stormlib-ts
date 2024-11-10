@@ -1,0 +1,112 @@
+name: Build and Deploy
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  prepare:
+    permissions: write-all
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-20.04
+            platform: linux
+            arch: x64
+          - os: windows-latest
+            platform: win32
+            arch: x64
+          - os: macos-15
+            platform: darwin
+            arch: x64
+          - os: macos-15
+            platform: darwin
+            arch: arm64
+    runs-on: ${{ matrix.os }}
+    env:
+      FILENAME: stormlib-ts-${{ matrix.platform }}-${{ matrix.arch }}.tar.gz
+    steps:
+      - run: git config --global core.fsmonitor false
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "18.19.0"
+
+      - name: Install ubuntu deps
+        if: contains(matrix.platform, 'linux')
+        run: |
+          sudo add-apt-repository ppa:okirby/qt6-backports
+          sudo apt update
+          sudo apt install mesa-common-dev libglu1-mesa-dev libegl1 libopengl-dev
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Setup action toolkit
+        run: pnpm install @actions/core && pnpm install tar
+
+      - name: Compress StormLib ts
+        if: ${{!contains(matrix.platform, 'win32')}}
+        uses: vixen-js/action-tar@v0.1.4
+        id: compress
+        with:
+          command: compress
+          cwd: ./build/Release
+          files: |
+            ./stormlib.node
+          outPath: ${{ env.FILENAME }}
+
+      - name: Compress StormLib ts (Windows)
+        if: contains(matrix.platform, 'win32')
+        uses: vixen-js/action-tar@v0.1.4
+        id: compress-win
+        with:
+          command: compress
+          cwd: ./build/Release
+          files: |
+            ./nodegui_core.node
+            ./nodegui_core.lib
+            ./nodegui_core.exp
+          outPath: ${{ env.FILENAME }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.FILENAME }}
+          path: ${{ env.FILENAME }}
+
+      - name: Upload release binaries
+        run: gh release upload "${{github.event.release.tag_name}}" ${{ env.FILENAME }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+  publish-npm:
+    needs: prepare
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "18.19.0"
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install ubuntu deps
+        run: |
+          sudo apt update
+          sudo apt install -y mesa-common-dev libglu1-mesa-dev
+
+      - name: Install dependencies
+        run: |
+          pnpm install --frozen-lockfile
+          echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' >> .npmrc
+          pnpm publish --no-git-checks
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

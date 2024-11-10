@@ -1,0 +1,9 @@
+.idea/
+node_modules/
+StormLib/
+stormlib-*.tgz
+tmp/
+build/
+dist/
+extracted/*
+!extracted/.gitkeep
