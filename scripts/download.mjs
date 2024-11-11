@@ -14,18 +14,27 @@ const BIN_URL = `https://github.com/FirelandsProject/Stormlib-ts/releases/downlo
 const STORMLIB_BIN_DIR = path.join(process.cwd(), "build", "Release");
 const FILE_DIR = path.join(STORMLIB_BIN_DIR, TAR_NAME);
 
+console.log("StormLib TS version:", VERSION);
+const compilationPath = path.join(process.cwd(), "StormLib");
+
+if (fs.existsSync(compilationPath)) {
+  console.log("🪣 Deleting compilation directory...");
+  fs.mkdirSync(compilationPath, { recursive: true });
+}
+
 if (!fs.existsSync(STORMLIB_BIN_DIR)) {
+  console.log("📁 Creating build directory...");
   fs.mkdirSync(STORMLIB_BIN_DIR, { recursive: true });
 }
 
-downloadBinary(FILE_DIR).then((skip) => {
-  if (skip || !fileExists(FILE_DIR)) {
-    console.log("Skip download binary");
-    return fs.rm(path.join(process.cwd(), "build"), { recursive: true }, () => {
-      return true;
-    });
+downloadBinary(FILE_DIR).then(async (skip) => {
+  if (skip) {
+    console.log("⏸️ Skip download binary");
+    const buildDir = path.join(process.cwd(), "build");
+    fs.rmSync(buildDir, { recursive: true });
+    return;
   }
-  console.log("Extracting Binaries...");
+  console.log("📚 Extracting Binaries...");
   unpack(FILE_DIR, STORMLIB_BIN_DIR, (err) => {
     if (err) {
       console.error(err);
@@ -39,29 +48,25 @@ downloadBinary(FILE_DIR).then((skip) => {
     });
     fs.unlinkSync(FILE_DIR);
     fs.unlinkSync(unpackFile);
-    console.log("StormLib compilation completed.");
+    console.log("✅ StormLib TS setup completed.");
   });
 });
 
 async function downloadBinary(dest = "") {
-  console.log(`Downloading Binaries from ${BIN_URL}`);
+  console.log(`💾 Downloading Binaries from ${BIN_URL}`);
   try {
     const response = await fetch(BIN_URL);
+    if (!response.ok) {
+      return true;
+    }
     const buffer = await response.arrayBuffer();
     const stream = fs.createWriteStream(dest);
     stream.write(Buffer.from(buffer));
     stream.end();
-  } catch (err) {
-    return true;
-  }
-  return false;
-}
+    console.log("🏁 Download completed. 🏁");
 
-function fileExists(path) {
-  try {
-    fs.accessSync(path);
-    return true;
-  } catch (err) {
     return false;
+  } catch (err) {
+    return true;
   }
 }
