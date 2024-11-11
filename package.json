@@ -13,7 +13,7 @@
     "build": "tsc",
     "test": "mocha",
     "example": "node ./example/index.mjs",
-    "prepublishOnly": "pnpm update-bin && pnpm build"
+    "prepublishOnly": "pnpm build"
   },
   "repository": {
     "type": "git",

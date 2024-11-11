@@ -18,7 +18,11 @@ if (!fs.existsSync(STORMLIB_BIN_DIR)) {
   fs.mkdirSync(STORMLIB_BIN_DIR, { recursive: true });
 }
 
-downloadBinary(FILE_DIR).then(() => {
+downloadBinary(FILE_DIR).then((skip) => {
+  if (skip || !fileExists(FILE_DIR)) {
+    console.log("Skip download binary");
+    return;
+  }
   console.log("Extracting Binaries...");
   unpack(FILE_DIR, STORMLIB_BIN_DIR, (err) => {
     if (err) {
@@ -39,10 +43,23 @@ downloadBinary(FILE_DIR).then(() => {
 
 async function downloadBinary(dest = "") {
   console.log(`Downloading Binaries from ${BIN_URL}`);
-  const response = await fetch(BIN_URL);
-  const buffer = await response.arrayBuffer();
-  const stream = fs.createWriteStream(dest);
-  stream.write(Buffer.from(buffer));
-  stream.end();
-  return true;
+  try {
+    const response = await fetch(BIN_URL);
+    const buffer = await response.arrayBuffer();
+    const stream = fs.createWriteStream(dest);
+    stream.write(Buffer.from(buffer));
+    stream.end();
+  } catch (err) {
+    return true;
+  }
+  return false;
+}
+
+function fileExists(path) {
+  try {
+    fs.accessSync(path);
+    return true;
+  } catch (err) {
+    return false;
+  }
 }
