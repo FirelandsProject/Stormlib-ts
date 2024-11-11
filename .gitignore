@@ -6,4 +6,3 @@ tmp/
 build/
 dist/
 extracted/*
-!extracted/.gitkeep
