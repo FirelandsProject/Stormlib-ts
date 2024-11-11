@@ -21,7 +21,9 @@ if (!fs.existsSync(STORMLIB_BIN_DIR)) {
 downloadBinary(FILE_DIR).then((skip) => {
   if (skip || !fileExists(FILE_DIR)) {
     console.log("Skip download binary");
-    return;
+    return fs.rm(path.join(process.cwd(), "build"), { recursive: true }, () => {
+      return true;
+    });
   }
   console.log("Extracting Binaries...");
   unpack(FILE_DIR, STORMLIB_BIN_DIR, (err) => {

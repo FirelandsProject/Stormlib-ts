@@ -1,14 +1,14 @@
 {
   "name": "@firelands/stormlib-ts",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Node.js bindings for StormLib to work with MPQ archives",
   "main": "dist/main.js",
   "type": "module",
   "scripts": {
     "dev": "tsc -w",
-    "update-bin": "node ./scripts/update-bin.mjs && pnpm post-update",
-    "post-update": "node-gyp rebuild",
-    "preinstall": "pnpm download",
+    "update-bin": "node ./scripts/update-bin.mjs && pnpm post-update-bin",
+    "post-update-bin": "node-gyp rebuild",
+    "postinstall": "pnpm download",
     "download": "node scripts/download.mjs",
     "build": "tsc",
     "test": "mocha",
