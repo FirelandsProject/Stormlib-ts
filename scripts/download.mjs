@@ -3,12 +3,11 @@ import * as tar from "tar";
 import fs from "fs";
 import path from "path";
 import os from "os";
-import { execSync } from "child_process";
 
 const platform = os.platform();
 const arch = os.arch();
 // get the last git tag name
-const VERSION = execSync("git describe --tags --abbrev=0").toString().trim();
+const VERSION = await getLatestTag();
 const TAR_NAME = `stormlib-ts-${platform}-${arch}.tar.gz`;
 const BIN_URL = `https://github.com/FirelandsProject/Stormlib-ts/releases/download/${VERSION}/${TAR_NAME}`;
 const STORMLIB_BIN_DIR = path.join(process.cwd(), "build", "Release");
@@ -69,4 +68,13 @@ async function downloadBinary(dest = "") {
   } catch (err) {
     return true;
   }
+}
+
+async function getLatestTag() {
+  const apiUrl =
+    "https://api.github.com/repos/FirelandsProject/Stormlib-ts/releases/latest";
+
+  const response = await fetch(apiUrl);
+  const data = await response.json();
+  return data.tag_name;
 }
