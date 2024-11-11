@@ -1,11 +1,11 @@
 import { StormLib } from "../dist/main.js";
-import { basename, resolve } from "path";
+import { resolve } from "path";
 
 async function runTest() {
   try {
     // Test creating a new archive
     const storm = new StormLib(resolve(process.cwd(), "example/base-Win.MPQ"));
-    const files = storm.listFiles();
+    const files = storm.listFiles("*Wow.exe");
     files.forEach((file) => {
       const nameParts = file.split("\\");
       const extracted = storm.extractFile(
