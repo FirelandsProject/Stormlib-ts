@@ -96,10 +96,21 @@ describe("StormLib::Archive", () => {
   describe("#readFile", () => {
     it("reads the file content inside the archive", () => {
       const archive = new StormLib(testMpqPath);
+
       expect(archive.openFileEx(archivedFileName)).to.be.true;
       expect(archive.readFile(testFileContent.length)).to.equal(
         testFileContent
       );
+      expect(archive.closeFile()).to.be.true;
+    });
+  });
+
+  describe("#getFileSize", () => {
+    it("gets the file size inside the archive", () => {
+      const archive = new StormLib(testMpqPath);
+
+      expect(archive.openFileEx(archivedFileName)).to.be.true;
+      expect(archive.getFileSize()).to.equal(testFileContent.length);
       expect(archive.closeFile()).to.be.true;
     });
   });

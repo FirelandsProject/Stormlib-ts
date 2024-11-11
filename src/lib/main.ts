@@ -10,6 +10,7 @@ const {
   openFileEx,
   closeFile,
   readFile,
+  getFileSize,
 } = bindings("stormlib");
 
 type StormLibOptions = {
@@ -109,5 +110,13 @@ export class StormLib {
    */
   readFile(size: number): string {
     return readFile(this.handleEx, size);
+  }
+
+  /**
+   * This function returns the size of the file
+   * @returns {number} Returns the size of the file
+   */
+  getFileSize(): number {
+    return getFileSize(this.handleEx);
   }
 }

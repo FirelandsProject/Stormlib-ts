@@ -228,6 +228,32 @@ Napi::Value CloseFile(const Napi::CallbackInfo &info)
   }
 }
 
+Napi::Value GetFileSize(const Napi::CallbackInfo &info)
+{
+  Napi::Env env = info.Env();
+
+  if (info.Length() < 1)
+  {
+    Napi::TypeError::New(env, "Wrong number of arguments").ThrowAsJavaScriptException();
+    return env.Null();
+  }
+
+  HANDLE hFile = reinterpret_cast<HANDLE>(info[0].As<Napi::Number>().Int64Value());
+  auto size = 0;
+
+  size = SFileGetFileSize(hFile, NULL);
+
+  if (size != 0)
+  {
+    return Napi::Number::New(env, size);
+  }
+  else
+  {
+    Napi::Error::New(env, "Failed to get file size").ThrowAsJavaScriptException();
+    return env.Null();
+  }
+}
+
 Napi::Object Init(Napi::Env env, Napi::Object exports)
 {
   exports.Set(Napi::String::New(env, "createArchive"), Napi::Function::New(env, CreateArchive));
@@ -239,6 +265,7 @@ Napi::Object Init(Napi::Env env, Napi::Object exports)
   exports.Set(Napi::String::New(env, "openFileEx"), Napi::Function::New(env, OpenFileEx));
   exports.Set(Napi::String::New(env, "readFile"), Napi::Function::New(env, ReadFile));
   exports.Set(Napi::String::New(env, "closeFile"), Napi::Function::New(env, CloseFile));
+  exports.Set(Napi::String::New(env, "getFileSize"), Napi::Function::New(env, GetFileSize));
 
   return exports;
 }
